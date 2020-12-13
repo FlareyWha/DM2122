@@ -54,6 +54,7 @@ private:
 		U_TOTAL,
 	};
 	bool lightOn;
+	bool axesOn;
 
 	float rotateHead;
 	int rotateHeadState;
@@ -128,6 +129,7 @@ public:
 	void walking(float LSPEED, double dt);
 	void attacking(float LSPEED, double dt);
 	void dancing(float LSPEED, double dt);
+	void reset(void);
 	void renderFloor(void);
 
 	//morgana functions

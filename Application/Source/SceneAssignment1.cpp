@@ -201,6 +201,7 @@ void SceneAssignment1::Init()
 	timer = 0;
 	camera.Init(Vector3(10, 10, 10), Vector3(0, 0, 0), Vector3(0, 1, 0));
 	lightOn = true;
+	axesOn = false;
 }
 
 void SceneAssignment1::Update(double dt)
@@ -221,13 +222,14 @@ void SceneAssignment1::Update(double dt)
 		lightOn = false;
 	if (Application::IsKeyPressed('0'))
 		lightOn = true;
+	if (Application::IsKeyPressed('Z'))
+		axesOn = false;
+	if (Application::IsKeyPressed('X'))
+		axesOn = true;
 	if (Application::IsKeyPressed('R'))
 	{
-		rotateHead = translateBodyX = translateBodyY = translateBodyZ = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rightUpperArmRotateAngleZ = rightUpperArmRotateAngleX = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
-
-		rotateHeadState = translateBodyYState = translateBodyZState = rotateBodyXState = rotateBodyYState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = rightUpperArmRotateStateZ = rightLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1;
-		rightUpperArmRotateStateX = -1;
-
+		reset();
+		translateBodyX = translateBodyY = translateBodyZ = 0;
 		isWalking = false;
 		isAttacking = false;
 		isDancing = false;
@@ -250,7 +252,7 @@ void SceneAssignment1::Update(double dt)
 	if (Application::IsKeyPressed('P'))
 		light[0].position.y += (float)(LSPEED * dt);
 
-	if (Application::IsKeyPressed(VK_UP))
+	if (Application::IsKeyPressed(VK_UP) && isAttacking == false && isDancing == false)
 	{
 		translateBodyZ += (float)(3 * dt);
 		isWalking = true;
@@ -262,7 +264,7 @@ void SceneAssignment1::Update(double dt)
 		isWalking = false;
 		pressed[0] = false;
 	}
-	if (Application::IsKeyPressed(VK_LEFT))
+	if (Application::IsKeyPressed(VK_LEFT) && isAttacking == false && isDancing == false)
 	{
 		translateBodyX += (float)(3 * dt);
 		isWalking = true;
@@ -274,7 +276,7 @@ void SceneAssignment1::Update(double dt)
 		isWalking = false;
 		pressed[1] = false;
 	}
-	if (Application::IsKeyPressed(VK_DOWN))
+	if (Application::IsKeyPressed(VK_DOWN) && isAttacking == false && isDancing == false)
 	{
 		translateBodyZ -= (float)(3 * dt);
 		isWalking = true;
@@ -286,7 +288,7 @@ void SceneAssignment1::Update(double dt)
 		isWalking = false;
 		pressed[2] = false;
 	}
-	if (Application::IsKeyPressed(VK_RIGHT))
+	if (Application::IsKeyPressed(VK_RIGHT) && isAttacking == false && isDancing == false)
 	{
 		translateBodyX -= (float)(3 * dt);
 		isWalking = true;
@@ -300,19 +302,22 @@ void SceneAssignment1::Update(double dt)
 	}
 	if (Application::IsKeyPressed(VK_SPACE)) //attack
 	{
+		reset();
 		isAttacking = true;
-		rotateBodyY = 0;
+		rotateBodyXState = 0;
 		attackingPhase = 1;
 		leftUpperArmRotateStateZ = -1;
+		swordRotateStateX = 0;
 		swordRotateStateY = 1;
-		leftLowerArmRotateState = -1;
+		leftLowerArmRotateState = 0;
 	}
+
 	if (Application::IsKeyPressed('G'))
 	{
+		reset();
 		isDancing = true;
 		danceState = 1;
-		rotateBodyY = 0;
-		rotateHeadState = 1;
+		rotateHeadState = 0;
 		rotateBodyYState = 1;
 		leftUpperArmRotateStateX = 1;
 		leftLowerArmRotateState = -1;
@@ -353,10 +358,11 @@ void SceneAssignment1::Render()
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z);
 	modelStack.LoadIdentity();
-
 	mvp = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &mvp.a[0]);
-	RenderMesh(meshList[GEO_AXES], false);
+
+	if (axesOn == true)
+		RenderMesh(meshList[GEO_AXES], false);
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
@@ -429,20 +435,12 @@ void SceneAssignment1::attacking(float LSPEED, double dt)
 			swordRotateStateZ = 0;
 		if (leftUpperArmRotateStateZ == 0 && leftUpperArmRotateStateX == 0 && translateBodyYState == 0 && translateBodyZState == 0 && upperLegRotateState == 0 && swordRotateStateY == 0)
 		{
+			attackingPhase = 2;
 			swordRotateStateX = 1;
 			swordRotateStateY = 1;
-			swordRotateStateZ = -1;
 			leftUpperArmRotateStateX = -1;
-			attackingPhase = 2;
+			leftLowerArmRotateState = -1;
 		}
-		translateBodyZ += (float)(translateBodyZState * LSPEED * dt);
-		translateBodyY += (float)(translateBodyYState * 4 * dt);
-		leftUpperArmRotateAngleZ += (float)(leftUpperArmRotateStateZ * LSPEED * 40 * dt);
-		leftUpperArmRotateAngleX += (float)(leftUpperArmRotateStateX * LSPEED * 40 * dt);
-		rotateUpperLegAngle += (float)(upperLegRotateState * LSPEED * 10 * dt);
-		rotateLowerLegAngle += (float)(lowerLegRotateState * LSPEED * 15 * dt);
-		swordRotateAngleY += (float)(swordRotateStateY * LSPEED * 40 * dt);
-		swordRotateAngleZ += (float)(swordRotateStateZ * LSPEED * 40 * dt);
 		break;
 
 	case 2:
@@ -455,26 +453,17 @@ void SceneAssignment1::attacking(float LSPEED, double dt)
 		if (swordRotateAngleY >= 180)
 			swordRotateStateY = 0;
 		if (leftUpperArmRotateStateX == 0 && leftLowerArmRotateState == 0)
-		{
 			timer += dt;
-		}
 		if (timer >= 1.5)
 		{
-			swordRotateStateX = 1;
-			swordRotateStateY = -1;
-			swordRotateStateZ = 1;
+			attackingPhase = 3;
+			swordRotateStateX = -1;
 			leftUpperArmRotateStateZ = 1;
 			leftUpperArmRotateStateX = 1;
 			leftLowerArmRotateState = 1;
-			attackingPhase = 3;
+			timer = 0;
 		}
-
-		leftLowerArmRotateAngle += (float)(leftLowerArmRotateState * LSPEED * 40 * dt);
-		leftUpperArmRotateAngleX += (float)(leftUpperArmRotateStateX * LSPEED * 40 * dt);
-		swordRotateAngleX += (float)(swordRotateStateX * LSPEED * 80 * dt);
-		swordRotateAngleY += (float)(swordRotateStateY * LSPEED * 80 * dt);
 		break;
-
 	case 3:
 		if (leftUpperArmRotateAngleZ >= 0)
 			leftUpperArmRotateStateZ = 0;
@@ -482,30 +471,27 @@ void SceneAssignment1::attacking(float LSPEED, double dt)
 			leftUpperArmRotateStateX = 0;
 		if (leftLowerArmRotateAngle >= 0)
 			leftLowerArmRotateState = 0;
-		if (swordRotateAngleX >= 0)
+		if (swordRotateAngleX <= 0)
 			swordRotateStateX = 0;
-		if (swordRotateAngleY <= 0)
-			swordRotateStateY = 0;
-		if (swordRotateAngleZ >= 0)
-			swordRotateStateZ = 0;
 		if (leftUpperArmRotateStateZ == 0 && leftUpperArmRotateStateX == 0 && leftLowerArmRotateState == 0)
 		{
+			attackingPhase = 4;
+			swordRotateStateY = -1;
+			swordRotateStateZ = -1;
+			rotateBodyXState = 1;
 			translateBodyY = 0.1;
 			translateBodyYState = 1;
 			translateBodyZState = -1;
 			upperLegRotateState = -1;
 			lowerLegRotateState = -1;
-			attackingPhase = 4;
 		}
-		leftUpperArmRotateAngleZ += (float)(leftUpperArmRotateStateZ * LSPEED * 40 * dt);
-		leftLowerArmRotateAngle += (float)(leftLowerArmRotateState * LSPEED * 40 * dt);
-		leftUpperArmRotateAngleX += (float)(leftUpperArmRotateStateX * LSPEED * 40 * dt);
-		swordRotateAngleX += (float)(swordRotateStateX * LSPEED * 20 * dt);
-		swordRotateAngleY += (float)(swordRotateStateY * LSPEED * 20 * dt);
-		swordRotateAngleZ += (float)(swordRotateStateZ * LSPEED * 20 * dt);
 		break;
 
 	case 4:
+		if (swordRotateAngleY <= 0)
+			swordRotateStateY = 0;
+		if (swordRotateAngleZ <= 0)
+			swordRotateStateZ = 0;
 		if (rotateUpperLegAngle <= 0)
 			upperLegRotateState = 0;
 		if (rotateLowerLegAngle <= 0)
@@ -520,22 +506,36 @@ void SceneAssignment1::attacking(float LSPEED, double dt)
 			translateBodyZState = 0;
 		if (translateBodyYState == 0)
 		{
-			translateBodyX = translateBodyY = translateBodyZ = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
+			translateBodyY = translateBodyZ = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
 
-			translateBodyYState = translateBodyZState = rotateBodyXState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1;
+			translateBodyYState = translateBodyZState = rotateBodyXState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1.0;
 			attackingPhase = 0;
 			timer = 0;
+			isAttacking = false;
 		}
-
-		rotateUpperLegAngle += (float)(upperLegRotateState * LSPEED * 10 * dt);
-		rotateLowerLegAngle += (float)(lowerLegRotateState * LSPEED * 15 * dt);
-		rotateBodyX += (float)(rotateBodyXState * LSPEED * 20 * dt);
-		translateBodyY += (float)(translateBodyYState * LSPEED * dt);
-		translateBodyZ += (float)(translateBodyZState * 6 * dt);
 		break;
 	default:
 		break;
 	}
+	if (attackingPhase == 1)
+	{
+		translateBodyZ += (float)(translateBodyZState * LSPEED * dt);
+		translateBodyY += (float)(translateBodyYState * 4 * dt);
+	}
+	else
+	{
+		translateBodyZ += (float)(translateBodyZState * 6 * dt);
+		translateBodyY += (float)(translateBodyYState * LSPEED * dt);
+	}
+	rotateBodyX += (float)(rotateBodyXState * LSPEED * 20 * dt);
+	leftUpperArmRotateAngleZ += (float)(leftUpperArmRotateStateZ * LSPEED * 40 * dt);
+	leftLowerArmRotateAngle += (float)(leftLowerArmRotateState * LSPEED * 40 * dt);
+	leftUpperArmRotateAngleX += (float)(leftUpperArmRotateStateX * LSPEED * 40 * dt);
+	rotateUpperLegAngle += (float)(upperLegRotateState * LSPEED * 10 * dt);
+	rotateLowerLegAngle += (float)(lowerLegRotateState * LSPEED * 15 * dt);
+	swordRotateAngleX += (float)(swordRotateStateX * LSPEED * 30 * dt);
+	swordRotateAngleY += (float)(swordRotateStateY * LSPEED * 30 * dt);
+	swordRotateAngleZ += (float)(swordRotateStateZ * LSPEED * 30 * dt);
 	isWalking = false;
 	isDancing = false;
 }
@@ -587,6 +587,7 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 		if (timer >= 1.0)
 		{
 			danceState = 3;
+			rotateHeadState = 1;
 			leftUpperArmRotateStateX = -1;
 			leftUpperArmRotateStateZ = -1;
 			leftLowerArmRotateState = 1;
@@ -598,6 +599,8 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 		break;
 
 	case 3:
+		if (rotateHead >= 20)
+			rotateHeadState = 0;
 		if (leftUpperArmRotateAngleX <= -20)
 			leftUpperArmRotateStateX = 0;
 		if (leftUpperArmRotateAngleZ <= -45)
@@ -636,6 +639,7 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 		if (timer >= 1.0)
 		{
 			danceState = 5;
+			rotateHeadState = -1;
 			rightUpperArmRotateStateX = -1;
 			rightUpperArmRotateStateZ = 1;
 			rightLowerArmRotateState = 1;
@@ -643,6 +647,8 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 		}
 		break;
 	case 5:
+		if (rotateHead <= 0)
+			rotateHeadState = 0;
 		if (rightUpperArmRotateAngleX <= -20)
 			rightUpperArmRotateStateX = 0;
 		if (rightUpperArmRotateAngleZ >= 45)
@@ -690,8 +696,8 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 		if (rotateBodyYState == 0 && leftUpperArmRotateStateZ == 0 && rightUpperArmRotateStateZ == 0)
 		{
 			danceState = 0;
-			rotateBodyY = leftUpperArmRotateAngleX = leftUpperArmRotateAngleZ = leftLowerArmRotateAngle = rightUpperArmRotateAngleX = rightUpperArmRotateAngleZ = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = 0;
-			rotateBodyYState = leftLowerArmRotateState = leftUpperArmRotateStateX = leftUpperArmRotateStateZ = rightLowerArmRotateState = rightUpperArmRotateStateZ = upperLegRotateState = lowerLegRotateState = 1;
+			rotateHead = rotateBodyY = leftUpperArmRotateAngleX = leftUpperArmRotateAngleZ = leftLowerArmRotateAngle = rightUpperArmRotateAngleX = rightUpperArmRotateAngleZ = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = 0;
+			rotateHeadState = rotateBodyYState = leftLowerArmRotateState = leftUpperArmRotateStateX = leftUpperArmRotateStateZ = rightLowerArmRotateState = rightUpperArmRotateStateZ = upperLegRotateState = lowerLegRotateState = 1;
 			rightUpperArmRotateStateX = -1;
 			isDancing = false;
 		}
@@ -699,6 +705,7 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 	default:
 		break;
 	}
+	rotateHead += (float)(rotateHeadState * LSPEED * 10 * dt);
 	rotateBodyY += (float)(rotateBodyYState * LSPEED * 10 * dt);
 	leftLowerArmRotateAngle += (float)(leftLowerArmRotateState * LSPEED * 10 * dt);
 	leftUpperArmRotateAngleX += (float)(leftUpperArmRotateStateX * LSPEED * 10 * dt);
@@ -714,6 +721,14 @@ void SceneAssignment1::dancing(float LSPEED, double dt)
 	isWalking = false;
 }
 
+void SceneAssignment1::reset(void)
+{
+	rotateHead = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rightUpperArmRotateAngleZ = rightUpperArmRotateAngleX = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
+
+	rotateHeadState = translateBodyYState = translateBodyZState = rotateBodyXState = rotateBodyYState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = rightUpperArmRotateStateZ = rightLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1.0;
+	rightUpperArmRotateStateX = -1.0;
+}
+
 void SceneAssignment1::renderFloor()
 {
 	//floor
@@ -724,7 +739,7 @@ void SceneAssignment1::renderFloor()
 	RenderMesh(meshList[GEO_QUAD], true);
 	modelStack.PopMatrix();
 
-	for (int i = -5; i < 5; i++)
+	for (int i = -5.0; i < 5.0; i++)
 	{
 		modelStack.PushMatrix();
 		modelStack.Translate(5, -2.5, i * 10);
@@ -780,20 +795,21 @@ void SceneAssignment1::renderHead(void)
 	modelStack.PushMatrix(); //1
 	modelStack.Translate(0, 2, 0);
 	modelStack.Rotate(90, 0, 1, 0);
+	modelStack.Rotate(rotateHead, 0, 0, 1);
 	modelStack.Scale(1.2, 1.2, 1.2);
 	RenderMesh(meshList[GEO_HEAD], true);
-	modelStack.PopMatrix(); //-1
-
+	modelStack.Rotate(-90, 0, 1, 0);
+	modelStack.Scale(0.8, 0.8, 0.8);
 	//left ear
-	modelStack.PushMatrix(); //1
-	modelStack.Translate(-1.6, 3.8, 0);
+	modelStack.PushMatrix(); //2
+	modelStack.Translate(-1.6, 1.8, 0);
 	modelStack.Rotate(45, 0, 0, 1);
 	modelStack.Scale(0.6, 0.6, 0.6);
 	RenderMesh(meshList[GEO_BLACK_CONE], true);
 	modelStack.PopMatrix(); //-1
 
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(-1.6, 3.8, 0.1);
+	modelStack.Translate(-1.6, 1.8, 0.1);
 	modelStack.Rotate(45, 0, 0, 1);
 	modelStack.Scale(0.4, 0.4, 0.4);
 	RenderMesh(meshList[GEO_WHITE_CONE], true);
@@ -801,14 +817,14 @@ void SceneAssignment1::renderHead(void)
 
 	//right ear
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(1.6, 3.8, 0);
+	modelStack.Translate(1.6, 1.8, 0);
 	modelStack.Rotate(-45, 0, 0, 1);
 	modelStack.Scale(0.6, 0.6, 0.6);
 	RenderMesh(meshList[GEO_BLACK_CONE], true);
 	modelStack.PopMatrix(); //-1
 
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(1.6, 3.8, 0.1);
+	modelStack.Translate(1.6, 1.8, 0.1);
 	modelStack.Rotate(-45, 0, 0, 1);
 	modelStack.Scale(0.4, 0.4, 0.4);
 	RenderMesh(meshList[GEO_WHITE_CONE], true);
@@ -816,7 +832,7 @@ void SceneAssignment1::renderHead(void)
 
 	//left eye
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(-1, 2.75, 1.15);
+	modelStack.Translate(-1, 0.75, 1.25);
 	modelStack.Rotate(-107.5, 1, 0, 0);
 	modelStack.Rotate(-20, 0, 0, 1);
 	modelStack.Scale(0.4, 0.4, 0.4);
@@ -825,7 +841,7 @@ void SceneAssignment1::renderHead(void)
 
 	//right eye
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(1, 2.75, 1.15);
+	modelStack.Translate(1, 0.75, 1.25);
 	modelStack.Rotate(-107.5, 1, 0, 0);
 	modelStack.Rotate(20, 0, 0, 1);
 	modelStack.Scale(0.4, 0.4, 0.4);
@@ -834,7 +850,7 @@ void SceneAssignment1::renderHead(void)
 
 	//mouth 
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(-0.15, 1.6, 0.97);
+	modelStack.Translate(-0.15, -0.5, 0.95);
 	modelStack.Rotate(-63, 1, 0, 0);
 	modelStack.Rotate(-2, 0, 0, 1);
 	modelStack.Scale(0.2, 0.2, 0.2);
@@ -842,12 +858,13 @@ void SceneAssignment1::renderHead(void)
 	modelStack.PopMatrix(); //-1
 
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(0.15, 1.6, 0.97);
+	modelStack.Translate(0.15, -0.5, 0.95);
 	modelStack.Rotate(-63, 1, 0, 0);
 	modelStack.Rotate(2, 0, 0, 1);
 	modelStack.Scale(0.2, 0.2, 0.2);
 	RenderMesh(meshList[GEO_BLACK_CONE], true);
 	modelStack.PopMatrix(); //-1
+	modelStack.PopMatrix();
 }
 
 void SceneAssignment1::renderScarf(void)
@@ -943,6 +960,20 @@ void SceneAssignment1::renderBelt(void)
 	modelStack.PushMatrix();
 	modelStack.Translate(0, -1.2, 0);
 	RenderMesh(meshList[GEO_BELT_CYLINDER], true);
+	modelStack.PushMatrix();
+	modelStack.Translate(-0.4, 0, 0.93);
+	modelStack.Rotate(65, 0, 1, 0);
+	modelStack.Rotate(90, 0, 0, 1);
+	modelStack.Scale(0.2, 0.2, 0.2);
+	RenderMesh(meshList[GEO_OVAL_SPHERE], true);
+	modelStack.PopMatrix();
+	modelStack.PushMatrix();
+	modelStack.Translate(0.4, 0, 0.93);
+	modelStack.Rotate(-65, 0, 1, 0);
+	modelStack.Rotate(90, 0, 0, 1);
+	modelStack.Scale(0.2, 0.2, 0.2);
+	RenderMesh(meshList[GEO_OVAL_SPHERE], true);
+	modelStack.PopMatrix();
 	modelStack.PopMatrix();
 }
 
