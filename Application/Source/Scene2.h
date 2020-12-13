@@ -1,9 +1,9 @@
-#ifndef SCENE_1_H
-#define SCENE_1_H
+#ifndef SCENE_2_H
+#define SCENE_2_H
 
 #include "Scene.h"
 
-class Scene1 : public Scene
+class Scene2 : public Scene
 {
 
 private:
@@ -14,14 +14,26 @@ private:
 		RANDOM_SHAPE = 2,
 		NUM_GEOMETRY,
 	};
+
+	enum UNIFORM_TYPE
+	{
+		U_MVP = 0,
+		U_TOTAL,
+	};
+
+	float rotateAngle;
+	float translateX;
+	float scaleAll;
+
 	unsigned m_vertexArrayID;
 	unsigned m_vertexBuffer[NUM_GEOMETRY];
 	unsigned m_colorBuffer[NUM_GEOMETRY];
 	unsigned m_programID;
+	unsigned m_parameters[U_TOTAL];
 
 public:
-	Scene1();
-	~Scene1();
+	Scene2();
+	~Scene2();
 
 	virtual void Init();
 	virtual void Update(double dt);

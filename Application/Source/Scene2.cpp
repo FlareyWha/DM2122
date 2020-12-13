@@ -1,24 +1,29 @@
-#include "Scene1.h"
+#include "Scene2.h"
 #include "GL\glew.h"
-
+#include "Mtx44.h"
+#include "Application.h"
 #include "shader.hpp"
 
 
-Scene1::Scene1()
+Scene2::Scene2()
 {
 }
 
-Scene1::~Scene1()
+Scene2::~Scene2()
 {
 }
 
-void Scene1::Init()
+void Scene2::Init()
 {
 	// Init VBO here
 	// set background colour to dark blue
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	glEnable(GL_DEPTH_TEST);
+
+	rotateAngle = 1;
+	translateX = 1;
+	scaleAll = 1;
 
 	// Generate a default VBO for now
 	glGenVertexArrays(1, &m_vertexArrayID);
@@ -28,19 +33,25 @@ void Scene1::Init()
 	glGenBuffers(NUM_GEOMETRY, &m_vertexBuffer[0]);
 	glGenBuffers(NUM_GEOMETRY, &m_colorBuffer[0]);
 
+	m_programID = LoadShaders("Shader//TransformVertexShader.vertexshader", "Shader//SimpleFragmentShader.fragmentshader");
+	//use our shader
+		
+	glUseProgram(m_programID);
+
+	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 
 	// EIGHT POLYGON
 	// An array of 3 vectors which represent 3 vertices
 	static const GLfloat vertex_buffer_data_8_polygon[] =
 	{
-		-0.65625f, 1.0f, 0.0f,
-		-0.34325f, 1.0f, 0.0f,
-		-0.875f, 0.71875f, 0.0f,
-		-0.125f, 0.71875f, 0.0f,
-		-0.875f, 0.28125f, 0.0f,
-		-0.125f, 0.28125f, 0.0f,
-		-0.65625f, 0.0f, 0.0f,
-		-0.34325f, 0.0f, 0.0f,
+		-0.1565f, 0.5f, 0.0f,
+		 0.1565f, 0.5f, 0.0f,
+		-0.37525f, 0.21875f, 0.0f,
+		 0.37425f, 0.21875f, 0.0f,
+		-0.37525f, -0.21875f, 0.0f,
+		 0.37425f, -0.21875f, 0.0f,
+		-0.1565f, -0.5f, 0.0f,
+		 0.1565f, -0.5f, 0.0f,
 	};
 
 	//set the current active buffer
@@ -69,15 +80,15 @@ void Scene1::Init()
 	// An array of 3 vectors which represent 3 vertices
 	static const GLfloat vertex_buffer_data_five_star[] =
 	{
-		0.125f, 0.7f, 0.0f, //left tip
-		0.625f, 0.7f, 0.0f, 
-		0.7f, 0.0f, 0.0f, //bottom left of star
-		0.875f, 0.7f, 0.0f, //right tip
-		0.375f, 0.7f, 0.0f,
-		0.3f, 0.0f, 0.0f, //bottom right of star
-		0.5f, 1.0f, 0.0f,
-		0.6f, 0.7f, 0.0f,
-		0.4f, 0.7f, 0.0f,
+		-0.375f, 0.2f, 0.0f, //left tip
+		0.125f, 0.2f, 0.0f, 
+		0.2f, -0.5f, 0.0f, //bottom left of star
+		0.375f, 0.2f, 0.0f, //right tip
+		-0.125f, 0.2f, 0.0f,
+		-0.2f, -0.5f, 0.0f, //bottom right of star
+		0.0f, 0.5f, 0.0f,
+		0.1f, 0.2f, 0.0f,
+		-0.1f, 0.2f, 0.0f,
 	};
 
 	//set the current active buffer
@@ -106,12 +117,12 @@ void Scene1::Init()
 	// An array of 3 vectors which represent 3 vertices
 	static const GLfloat vertex_buffer_data_random[] =
 	{
-		0.4f, -0.2f, 0.0f,
-		0.78f, -1.0f, 0.0f,
-		0.45f, -0.7f, 0.0f,
-		-0.55f, -0.5f, 0.0f,
-		0.1f, 0.0f, 0.0f,
-		0.4f, -0.2f, 0.0f
+		0.2f, 0.3f, 0.0f,
+		0.58f, -0.5f, 0.0f,
+		0.25f, -0.2f, 0.0f,
+		-0.75f, 0.0f, 0.0f,
+		-0.1f, 0.5f, 0.0f,
+		0.2f, 0.3f, 0.0f
 	};
 
 	//set the current active buffer
@@ -132,24 +143,60 @@ void Scene1::Init()
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer[RANDOM_SHAPE]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data_random), color_buffer_data_random, GL_STATIC_DRAW);
-
-	m_programID = LoadShaders("Shader//SimpleVertexShader.vertexshader", "Shader//SimpleFragmentShader.fragmentshader");
-	//use our shader
-
-	glUseProgram(m_programID);
 }
 
-void Scene1::Update(double dt)
+void Scene2::Update(double dt)
 {
+	//change so each one is not synced
+
+	int randNumber = rand() % 50;
+
+	if (Application::IsKeyPressed(VK_SPACE))
+	{
+		if (rotateAngle >= 360)
+			rotateAngle += (float)(10 * dt);
+		else
+			rotateAngle -= (float)(10 * dt);
+
+		if (translateX >= 10)
+			translateX = -10;
+		else
+			translateX += (float)(randNumber * dt);
+
+		if (scaleAll >= 10)
+			scaleAll = 1;
+		else
+			scaleAll += (float)(2 * dt);
+	}
 }
 
-void Scene1::Render()
+void Scene2::Render()
 {
 	// Render VBO here
 	// Clear color buffer for every frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	Mtx44 translate, rotate, scale;
+	Mtx44 model;
+	Mtx44 view;
+	Mtx44 projection;
+	Mtx44 MVP;
+
+	translate.SetToIdentity();
+	rotate.SetToIdentity();
+	scale.SetToIdentity();
+	model.SetToIdentity();
+	view.SetToIdentity(); //no need camera for now, set to origin
+	projection.SetToOrtho(-10, 10, -10, 10, -10, 10);
+
 	//EIGHT POLYGON
+	scale.SetToScale(7, 7, 7);
+	rotate.SetToRotation(rotateAngle, 0, 0, 1);
+	translate.SetToTranslation(5, 2, 0);
+	model = translate * rotate * scale; //scale, followed by rotate, then lastly translate
+	MVP = projection * view * model; //Remember, matrix multiplaction is the other way around
+	
+	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with the new MVP
 	glEnableVertexAttribArray(0); //1st attribute buffer: vertices
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[EIGHT_POLYGON]);
 	glVertexAttribPointer(
@@ -172,6 +219,13 @@ void Scene1::Render()
 
 	
 	// FIVE STAR
+	scale.SetToScale(scaleAll, scaleAll, scaleAll);
+	rotate.SetToRotation(0, 0, 0, 1);
+	translate.SetToTranslation(-7, -1, 0);
+	model = translate * rotate * scale; //scale, followed by rotate, then lastly translate
+	MVP = projection * view * model; //Remember, matrix multiplaction is the other way around
+	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with the new MVP
+
 	glEnableVertexAttribArray(0); //1st attribute buffer: vertices
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[FIVE_STAR]);
 	glVertexAttribPointer(
@@ -193,6 +247,13 @@ void Scene1::Render()
 	glDisableVertexAttribArray(0);
 
 	// RANDOM
+	scale.SetToScale(5, 5, 5);
+	rotate.SetToRotation(rotateAngle, 0, 0, 1);
+	translate.SetToTranslation(translateX, 5, 8);
+	model = translate * rotate * scale; //scale, followed by rotate, then lastly translate
+	MVP = projection * view * model; //Remember, matrix multiplaction is the other way around
+	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with the new MVP
+
 	glEnableVertexAttribArray(0); //1st attribute buffer: vertices
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[RANDOM_SHAPE]);
 	glVertexAttribPointer(
@@ -215,7 +276,7 @@ void Scene1::Render()
 	
 }
 
-void Scene1::Exit()
+void Scene2::Exit()
 {
 	// Cleanup VBO here
 	glDeleteBuffers(NUM_GEOMETRY, &m_vertexBuffer[0]);

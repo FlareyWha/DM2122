@@ -10,8 +10,16 @@
 //Include the standard C++ headers
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "Scene1.h"
+#include "Scene2.h"
+#include "Scene3.h"
+#include "Scene4.h"
+#include "Scene5.h"
+#include "SceneLight.h"
+#include "SceneLight2.h"
+#include "SceneAssignment1.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -36,12 +44,22 @@ bool Application::IsKeyPressed(unsigned short key)
     return ((GetAsyncKeyState(key) & 0x8001) != 0);
 }
 
+bool Application::IsKeyReleased(unsigned short key)
+{
+	return ((GetAsyncKeyState(key) & 0x8001) == 0);
+}
+
 Application::Application()
 {
 }
 
 Application::~Application()
 {
+}
+
+void resize_callback(GLFWwindow* window, int w, int h)
+{
+	glViewport(0, 0, w, h); //update opengl the new window size	
 }
 
 void Application::Init()
@@ -66,10 +84,12 @@ void Application::Init()
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(800, 600, "Test Window", NULL, NULL);
 
+	glfwSetWindowSizeCallback(m_window, resize_callback);
+
 	//If the window couldn't be created
 	if (!m_window)
 	{
-		fprintf( stderr, "Failed to open GLFW window.\n" );
+		fprintf(stderr, "Failed to open GLFW window.\n");
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
@@ -85,17 +105,19 @@ void Application::Init()
 	GLenum err = glewInit();
 
 	//If GLEW hasn't initialized
-	if (err != GLEW_OK) 
+	if (err != GLEW_OK)
 	{
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		//return -1;
 	}
+
+	srand(time(NULL));
 }
 
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new Scene1();
+	Scene *scene = new SceneAssignment1();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame

@@ -12,7 +12,8 @@ public:
 	void Init();
 	void Run();
 	void Exit();
-	bool IsKeyPressed(unsigned short key);
+	static bool IsKeyPressed(unsigned short key);
+	static bool IsKeyReleased(unsigned short key);
 
 private:
 
