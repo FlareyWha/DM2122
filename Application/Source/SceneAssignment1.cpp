@@ -6,7 +6,6 @@
 #include "Vertex.h"
 #include "Utility.h"
 #include "shader.hpp"
-#include <iostream>
 
 SceneAssignment1::SceneAssignment1()
 {
@@ -336,8 +335,6 @@ void SceneAssignment1::Update(double dt)
 
 	if (isDancing == true)
 		dancing(LSPEED, dt);
-
-	std::cout << upperLegRotateState;
 }
 
 void SceneAssignment1::Render()
