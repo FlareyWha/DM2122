@@ -65,23 +65,23 @@ void SceneLight::Init()
 	meshList[GEO_RING] = MeshBuilder::GenerateRing("ring", Color(1, 1, 0), 1.0f, 0.9f);
 	meshList[GEO_RING_2] = MeshBuilder::GenerateRing("ring2", Color(0.3, 0.6, 0.9), 1.0f, 0.95f);
 
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("sphere", Color(1, 0.6, 0), 1.0f);
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("sphere", Color(1, 0.6, 0), 36, 36, 1.0f);
 	//CAN CHANGE COLOUR BASED ON THE MATERIAL!!!
 	meshList[GEO_SPHERE]->material.kAmbient.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_SPHERE]->material.kDiffuse.Set(0.6f, 0.6f, 0.6f);
 	meshList[GEO_SPHERE]->material.kSpecular.Set(0.3f, 0.3f, 0.3f);
 	meshList[GEO_SPHERE]->material.kShininess = 5.f;
 
-	meshList[GEO_SPHERE_2] = MeshBuilder::GenerateSphere("sphere2", Color(1, 0, 0), 1.0f);
-	meshList[GEO_SPHERE_3] = MeshBuilder::GenerateSphere("sphere3", Color(1, 1, 1), 1.0f);
-	meshList[GEO_SPHERE_4] = MeshBuilder::GenerateSphere("sphere4", Color(0.5, 0.5, 0.5), 1.0f);
-	meshList[GEO_SPHERE_5] = MeshBuilder::GenerateSphere("sphere5", Color(0.3, 0.2, 0.1), 1.0f);
+	meshList[GEO_SPHERE_2] = MeshBuilder::GenerateSphere("sphere2", Color(1, 0, 0), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_3] = MeshBuilder::GenerateSphere("sphere3", Color(1, 1, 1), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_4] = MeshBuilder::GenerateSphere("sphere4", Color(0.5, 0.5, 0.5), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_5] = MeshBuilder::GenerateSphere("sphere5", Color(0.3, 0.2, 0.1), 36, 36, 1.0f);
 	meshList[GEO_HEMISPHERE] = MeshBuilder::GenerateHemisphere("hemisphere", Color(1, 1, 1), 1.0f);
 	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("cylinder", Color(1, 1, 1), 1.0f, 5.0f, 10);
 	meshList[GEO_CONE] = MeshBuilder::GenerateCone("cone", Color(0.9, 0.3, 0.5), 10, 1.0f, 5.0f);
 	meshList[GEO_TORUS] = MeshBuilder::GenerateTorus("torus", Color(0.9, 0.9, 0.9), 50, 50, 1.0f, 0.1f);
 
-	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 1.0f);
+	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 36, 36, 1.0f);
 	
 	Mtx44 projection;
 	projection.SetToPerspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);

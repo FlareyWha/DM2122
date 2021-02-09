@@ -145,13 +145,13 @@ void SceneAssignment1::Init()
 	meshList[GEO_BLADE]->material.kSpecular.Set(0.1f, 0.1f, 0.1f);
 	meshList[GEO_BLADE]->material.kShininess = 1.f;
 
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("sphere", Color(1, 1, 1), 1.0f);
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("sphere", Color(1, 1, 1), 36, 36, 1.0f);
 	meshList[GEO_SPHERE]->material.kAmbient.Set(0.0f, 0.0f, 0.0f);
 	meshList[GEO_SPHERE]->material.kDiffuse.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_SPHERE]->material.kSpecular.Set(0.3f, 0.3f, 0.3f);
 	meshList[GEO_SPHERE]->material.kShininess = 1.f;
 
-	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 1.0f);
+	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 36, 36, 1.0f);
 	
 	Mtx44 projection;
 	projection.SetToPerspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);

@@ -38,11 +38,11 @@ void Scene5::Init()
 	meshList[GEO_CIRCLE] = MeshBuilder::GenerateCircle("circle", Color(1, 0, 0), 1.0f);
 	meshList[GEO_RING] = MeshBuilder::GenerateRing("ring", Color(1, 1, 0), 1.0f, 0.9f);
 	meshList[GEO_RING_2] = MeshBuilder::GenerateRing("ring2", Color(0.3, 0.6, 0.9), 1.0f, 0.95f);
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("sphere", Color(1, 0.6, 0), 1.0f);
-	meshList[GEO_SPHERE_2] = MeshBuilder::GenerateSphere("sphere2", Color(1, 0, 0), 1.0f);
-	meshList[GEO_SPHERE_3] = MeshBuilder::GenerateSphere("sphere3", Color(1, 1, 1), 1.0f);
-	meshList[GEO_SPHERE_4] = MeshBuilder::GenerateSphere("sphere4", Color(0.5, 0.5, 0.5), 1.0f);
-	meshList[GEO_SPHERE_5] = MeshBuilder::GenerateSphere("sphere5", Color(0.3, 0.2, 0.1), 1.0f);
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("sphere", Color(1, 0.6, 0), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_2] = MeshBuilder::GenerateSphere("sphere2", Color(1, 0, 0), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_3] = MeshBuilder::GenerateSphere("sphere3", Color(1, 1, 1), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_4] = MeshBuilder::GenerateSphere("sphere4", Color(0.5, 0.5, 0.5), 36, 36, 1.0f);
+	meshList[GEO_SPHERE_5] = MeshBuilder::GenerateSphere("sphere5", Color(0.3, 0.2, 0.1), 36, 36, 1.0f);
 	meshList[GEO_HEMISPHERE] = MeshBuilder::GenerateHemisphere("hemisphere", Color(1, 1, 1), 1.0f);
 	meshList[GEO_CYLINDER] = MeshBuilder::GenerateCylinder("cylinder", Color(1, 1, 1), 1.0f, 5.0f, 10);
 	

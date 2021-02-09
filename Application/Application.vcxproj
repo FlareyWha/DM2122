@@ -89,6 +89,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\glew\include;$(SolutionDir)\glfw\include;$(SolutionDir)\Common\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,6 +107,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\glew\include;$(SolutionDir)\glfw\include;$(SolutionDir)\Common\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,6 +150,11 @@
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Camera2.cpp" />
+    <ClCompile Include="Source\Camera3.cpp" />
+    <ClCompile Include="Source\Enemy.cpp" />
+    <ClCompile Include="Source\LoadCSV.cpp" />
+    <ClCompile Include="Source\LoadOBJ.cpp" />
+    <ClCompile Include="Source\LoadTGA.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
@@ -157,8 +164,14 @@
     <ClCompile Include="Source\Scene4.cpp" />
     <ClCompile Include="Source\Scene5.cpp" />
     <ClCompile Include="Source\SceneAssignment1.cpp" />
+    <ClCompile Include="Source\SceneAssignment2.cpp" />
     <ClCompile Include="Source\SceneLight.cpp" />
     <ClCompile Include="Source\SceneLight2.cpp" />
+    <ClCompile Include="Source\SceneModel.cpp" />
+    <ClCompile Include="Source\SceneSkybox.cpp" />
+    <ClCompile Include="Source\SceneText.cpp" />
+    <ClCompile Include="Source\SceneTexture.cpp" />
+    <ClCompile Include="Source\SceneUI.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
   </ItemGroup>
@@ -166,7 +179,12 @@
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Camera2.h" />
+    <ClInclude Include="Source\Camera3.h" />
+    <ClInclude Include="Source\Enemy.h" />
     <ClInclude Include="Source\Light.h" />
+    <ClInclude Include="Source\LoadCSV.h" />
+    <ClInclude Include="Source\LoadOBJ.h" />
+    <ClInclude Include="Source\LoadTGA.h" />
     <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\MeshBuilder.h" />
@@ -177,11 +195,20 @@
     <ClInclude Include="Source\Scene4.h" />
     <ClInclude Include="Source\Scene5.h" />
     <ClInclude Include="Source\SceneAssignment1.h" />
+    <ClInclude Include="Source\SceneAssignment2.h" />
     <ClInclude Include="Source\SceneLight.h" />
     <ClInclude Include="Source\SceneLight2.h" />
+    <ClInclude Include="Source\SceneModel.h" />
+    <ClInclude Include="Source\SceneSkybox.h" />
+    <ClInclude Include="Source\SceneText.h" />
+    <ClInclude Include="Source\SceneTexture.h" />
+    <ClInclude Include="Source\SceneUI.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\Utility.h" />
     <ClInclude Include="Source\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\FontData.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
