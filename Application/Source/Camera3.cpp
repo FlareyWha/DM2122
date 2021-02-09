@@ -224,6 +224,20 @@ void Camera3::boundsCheck(int gameState)
 		/*if (position.z <= -680) //activate this ltr
 			position.z = -680;*/
 		break;
+	case 4: 
+		if (position.z <= -1045)
+			position.z = -1045;
+		break;
+	case 5:
+		if (position.z <= -1045)
+			position.z = -1045;
+		if (position.x <= -20)
+			position.x = -20;
+		break;
+	case 6:
+		if (position.z <= -1045)
+			position.z = -1045;
+		break;
 	default:
 		break;
 	}

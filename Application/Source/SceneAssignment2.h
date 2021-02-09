@@ -141,6 +141,8 @@ private:
 	int translateBodyYState;
 	float translateBodyZ;
 	int translateBodyZState;
+	float translateBodyZExtra;
+	int translateBodyZExtraState;
 	float rotateBodyX;
 	int rotateBodyXState;
 	float rotateBodyY;
@@ -187,6 +189,8 @@ private:
 	bool doorOpen;
 	bool pickUpKey;
 	double textTimer;
+	float fakeFrontScale;
+	bool fakeFrontScaleState;
 
 	int gameState;
 	int subGameState;

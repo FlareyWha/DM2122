@@ -300,6 +300,8 @@ void SceneAssignment2::initMorgana()
 	translateBodyYState = 1;
 	translateBodyZ = 0;
 	translateBodyZState = 1;
+	translateBodyZExtra = 0;
+	translateBodyZExtraState = 1;
 	rotateBodyX = 0;
 	rotateBodyXState = 1;
 	rotateBodyY = 0;
@@ -342,6 +344,7 @@ void SceneAssignment2::initScene()
 	doorOpen = false;
 	pickUpKey = false;
 	showDebugInfo = true;
+	fakeFrontScale = 50;
 	textTimer = -1;
 
 	enemy[0].init(Vector3(50, 0, -560), 0, 0, '0', 90, 1);
@@ -408,6 +411,7 @@ void SceneAssignment2::Update(double dt)
 		enemy[i].update(dt);
 	if (textTimer >= 0)
 		textTimer += dt;
+
 	collisionWithEnemy();
 
 	if (Application::IsKeyPressed('1')) //0x31
@@ -462,7 +466,7 @@ void SceneAssignment2::Update(double dt)
 		std::cout << "X: " << camera.position.x << ", " << "Z: " << camera.position.z << std::endl;
 	}
 
-	/*if (Application::IsKeyPressed('R'))
+	if (Application::IsKeyPressed('R'))
 	{
 		reset();
 		translateBodyX = translateBodyY = translateBodyZ = 0;
@@ -473,48 +477,36 @@ void SceneAssignment2::Update(double dt)
 		timer = 0;
 		light[0].position.Set(0, 20, 0);
 		camera.Reset(Vector3(0, 0, 10), Vector3(0, 0, 0), Vector3(0, 1, 0));
-	}*/
-
-	if (Application::IsKeyPressed('I'))
-		light[1].position.z -= (float)(LSPEED * dt);
-	if (Application::IsKeyPressed('K'))
-		light[1].position.z += (float)(LSPEED * dt);
-	if (Application::IsKeyPressed('J'))
-		light[1].position.x -= (float)(LSPEED * dt);
-	if (Application::IsKeyPressed('L'))
-		light[1].position.x += (float)(LSPEED * dt);
-	if (Application::IsKeyPressed('O'))
-		light[1].position.y -= (float)(LSPEED * dt);
-	if (Application::IsKeyPressed('P'))
-		light[1].position.y += (float)(LSPEED * dt);
-
-	if (Application::IsKeyPressed(VK_SPACE)) //attack
-	{
-		reset();
-		isAttacking = true;
-		rotateBodyXState = 0;
-		attackingPhase = 1;
-		leftUpperArmRotateStateZ = -1;
-		swordRotateStateX = 0;
-		swordRotateStateY = 1;
-		leftLowerArmRotateState = 0;
 	}
 
-	if (Application::IsKeyPressed('G')) //dancing
-	{
-		reset();
-		isDancing = true;
-		danceState = 1;
-		rotateHeadState = 0;
-		rotateBodyYState = 1;
-		leftUpperArmRotateStateX = 1;
-		leftLowerArmRotateState = -1;
-		rightUpperArmRotateStateX = -1;
-		rightUpperArmRotateStateZ = 1;
-		rightLowerArmRotateState = -1;
-		upperLegRotateState = -1;
-		lowerLegRotateState = -1;
-	}
+	//if (Application::IsKeyPressed(VK_SPACE)) //attack
+	//{
+	//	reset();
+	//	isAttacking = true;
+	//	rotateBodyXState = 0;
+	//	attackingPhase = 1;
+	//	translateBodyZExtraState = -1;
+	//	leftUpperArmRotateStateZ = -1;
+	//	swordRotateStateX = 0;
+	//	swordRotateStateY = 1;
+	//	leftLowerArmRotateState = 0;
+	//}
+
+	//if (Application::IsKeyPressed('G')) //dancing
+	//{
+	//	reset();
+	//	isDancing = true;
+	//	danceState = 1;
+	//	rotateHeadState = 0;
+	//	rotateBodyYState = 1;
+	//	leftUpperArmRotateStateX = 1;
+	//	leftLowerArmRotateState = -1;
+	//	rightUpperArmRotateStateX = -1;
+	//	rightUpperArmRotateStateZ = 1;
+	//	rightLowerArmRotateState = -1;
+	//	upperLegRotateState = -1;
+	//	lowerLegRotateState = -1;
+	//}
 
 	if (isWalking == true)
 		walking(LSPEED, dt);
@@ -805,8 +797,51 @@ void SceneAssignment2::renderGameText() //render text
 		{
 			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(0, 1, 0), 4, 0, 0);
 			modelStack.PushMatrix();
-			modelStack.Translate(130, 0, -845);
+			modelStack.Translate(125, 0, -845);
 			modelStack.Rotate(-90, 0, 1, 0);
+			modelStack.Scale(5, 5, 5);
+			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
+			modelStack.PopMatrix();
+		}
+		break;
+	case 5:
+		if (textTimer >= 0)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Its a dead end. This is weird.", Color(0, 1, 0), 4, 0, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe there's something behind this wall?", Color(0, 1, 0), 4, 0, 0);
+		}
+		break;
+	case 6:
+		if (subGameState == 1)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: That didnt work.", Color(0, 1, 0), 4, 0, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT], "There must be something here.", Color(0, 1, 0), 4, 0, 0);
+		}
+		if (camera.checkPosition(-80, -90, 0, -980, -1000) == true && subGameState == 2)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: A pedestal?", Color(0, 1, 0), 4, 0, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Wonder what its for...", Color(0, 1, 0), 4, 0, 0);
+		}
+		if (camera.checkPosition(100, 90, 0, -830, -840) == true && pickUpKey == false)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(0, 1, 0), 4, 0, 0);
+			modelStack.PushMatrix();
+			modelStack.Translate(125, 0, -845);
+			modelStack.Rotate(-90, 0, 1, 0);
+			modelStack.Scale(5, 5, 5);
+			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
+			modelStack.PopMatrix();
+		}
+		if (subGameState == 3 && pickUpKey == true && textTimer == -1)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Oh u have a key?", Color(0, 1, 0), 4, 0, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe try putting it on that pedestal?", Color(0, 1, 0), 4, 0, 0);
+		}
+		if (Application::IsKeyPressed('E') && camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 3 && pickUpKey == true)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(-100, 0, -970);
+			modelStack.Rotate(90, 0, 1, 0);
 			modelStack.Scale(5, 5, 5);
 			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
 			modelStack.PopMatrix();
@@ -894,6 +929,7 @@ void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana wi
 		}
 		if (translateBodyX >= 30 && subGameState == 5)
 		{
+			reset();
 			translateBodyZState = 0;
 			translateBodyXState = 0;
 			rotateBodyY = -90;
@@ -920,13 +956,70 @@ void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana wi
 			isWalking = false;
 		}
 		if (textTimer >= 5)
+		{
 			textTimer = -1;
+			translateBodyX = 0;
+			translateBodyZ = -1035;
+			rotateBodyYState = -90;
+		}
 		if (Application::IsKeyPressed('E') && camera.checkPosition(100, 90, 0, -830, -840) == true && pickUpKey == false)
 		{
 			pickUpKey = true;
 		}
+		if (camera.checkPosition(80, 0, 0, -953, -1045) == true && subGameState == 0)
+		{
+			rotateBodyY = 90;
+			gameState = 5;
+			textTimer = 0;
+		}
 		translateBodyX += (float)(translateBodyXState * 35 * dt);
 		break;
+	case 5:
+		if (textTimer >= 3)
+		{
+			reset();
+			textTimer = -1;
+			isAttacking = true;
+			rotateBodyY = 180;
+			rotateBodyXState = 0;
+			attackingPhase = 1;
+			translateBodyZExtraState = -1;
+			leftUpperArmRotateStateZ = -1;
+			swordRotateStateX = 0;
+			swordRotateStateY = 1;
+			leftLowerArmRotateState = 0;
+		}
+		if (textTimer == -1 && isAttacking == false)
+		{
+			reset();
+			rotateBodyY = 180;
+			gameState = 6;
+			subGameState = 1;
+		}
+		break;
+	case 6:
+		if (camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 1)
+		{
+			subGameState = 2;
+			textTimer = 0;
+		}
+		if (textTimer >= 3)
+		{
+			textTimer = -1;
+			subGameState = 3;
+		}
+		if (Application::IsKeyPressed('E') && camera.checkPosition(100, 90, 0, -830, -840) == true && pickUpKey == false)
+			pickUpKey = true;
+		if (Application::IsKeyPressed('E') && camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 3 && pickUpKey == true)
+		{
+			pickUpKey == false;
+			gameState = 7;
+		}
+		break;
+	case 7:
+		if (fakeFrontScale <= 0)
+			fakeFrontScaleState = 0;
+		fakeFrontScale += (float)(fakeFrontScaleState * 35 * dt);
 	}
 }
 
@@ -1352,6 +1445,12 @@ void SceneAssignment2::renderRoom(void)
 			modelStack.Scale(50, 50, 50);
 			RenderMesh(meshList[GEO_FLOOR], true);
 			modelStack.PopMatrix();
+
+			modelStack.PushMatrix(); //fake front
+			modelStack.Translate(-150 + x * 50, y * 50 - 15, -1050);
+			modelStack.Scale(fakeFrontScale, fakeFrontScale, fakeFrontScale);
+			RenderMesh(meshList[GEO_FLOOR], true);
+			modelStack.PopMatrix();
 		}
 	}
 
@@ -1378,9 +1477,23 @@ void SceneAssignment2::renderRoom(void)
 	modelStack.PushMatrix(); //top
 	modelStack.Translate(120, -15, -840);
 	RenderMesh(meshList[GEO_TOWERSQUAREBASE], true);
-	if (pickUpKey == false && gameState == 4)
+	if (pickUpKey == false)
 	{
-		modelStack.PushMatrix(); //top
+		modelStack.PushMatrix();
+		modelStack.Translate(-5, 10.5, 5);
+		modelStack.Rotate(90, 1, 0, 0);
+		modelStack.Scale(0.5, 0.5, 0.5);
+		RenderMesh(meshList[GEO_KEY], true);
+		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix(); //top
+	modelStack.Translate(-100, -15, -990);
+	RenderMesh(meshList[GEO_TOWERSQUAREBASE], true);
+	if (pickUpKey == false && gameState == 7)
+	{
+		modelStack.PushMatrix();
 		modelStack.Translate(-5, 10.5, 5);
 		modelStack.Rotate(90, 1, 0, 0);
 		modelStack.Scale(0.5, 0.5, 0.5);
@@ -1680,13 +1793,13 @@ void SceneAssignment2::attacking(float LSPEED, double dt)
 			upperLegRotateState = 0;
 		if (rotateLowerLegAngle >= 33.75)
 			lowerLegRotateState = 0;
-		if (translateBodyZ >= 10)
-			translateBodyZState = 0;
+		if (translateBodyZExtra <= -10)
+			translateBodyZExtraState = 0;
 		if (swordRotateAngleY >= 135)
 			swordRotateStateY = 0;
 		if (swordRotateAngleZ >= 110)
 			swordRotateStateZ = 0;
-		if (leftUpperArmRotateStateZ == 0 && leftUpperArmRotateStateX == 0 && translateBodyYState == 0 && translateBodyZState == 0 && upperLegRotateState == 0 && swordRotateStateY == 0)
+		if (leftUpperArmRotateStateZ == 0 && leftUpperArmRotateStateX == 0 && translateBodyYState == 0 && translateBodyZExtraState == 0 && upperLegRotateState == 0 && swordRotateStateY == 0)
 		{
 			attackingPhase = 2;
 			swordRotateStateX = 1;
@@ -1734,7 +1847,7 @@ void SceneAssignment2::attacking(float LSPEED, double dt)
 			rotateBodyXState = 1;
 			translateBodyY = 0.1;
 			translateBodyYState = 1;
-			translateBodyZState = -1;
+			translateBodyZExtraState = 1;
 			upperLegRotateState = -1;
 			lowerLegRotateState = -1;
 		}
@@ -1755,13 +1868,13 @@ void SceneAssignment2::attacking(float LSPEED, double dt)
 			translateBodyYState = -1;
 		else if (translateBodyY < 0)
 			translateBodyYState = 0;
-		if (translateBodyZ <= 0)
-			translateBodyZState = 0;
+		if (translateBodyZExtra >= 0)
+			translateBodyZExtraState = 0;
 		if (translateBodyYState == 0)
 		{
-			translateBodyY = translateBodyZ = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
+			translateBodyY = translateBodyZExtra = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
 
-			translateBodyYState = translateBodyZState = rotateBodyXState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1.0;
+			translateBodyYState = translateBodyZExtraState = rotateBodyXState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1.0;
 			attackingPhase = 0;
 			timer = 0;
 			isAttacking = false;
@@ -1772,12 +1885,12 @@ void SceneAssignment2::attacking(float LSPEED, double dt)
 	}
 	if (attackingPhase == 1)
 	{
-		translateBodyZ += (float)(translateBodyZState * LSPEED * dt);
+		translateBodyZExtra += (float)(translateBodyZExtraState * LSPEED * dt);
 		translateBodyY += (float)(translateBodyYState * 4 * dt);
 	}
 	else
 	{
-		translateBodyZ += (float)(translateBodyZState * 6 * dt);
+		translateBodyZExtra += (float)(translateBodyZExtraState * 6 * dt);
 		translateBodyY += (float)(translateBodyYState * LSPEED * dt);
 	}
 	rotateBodyX += (float)(rotateBodyXState * LSPEED * 20 * dt);
@@ -1976,9 +2089,9 @@ void SceneAssignment2::dancing(float LSPEED, double dt)
 
 void SceneAssignment2::reset(void)
 {
-	rotateHead = rotateBodyX = rotateBodyY = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rightUpperArmRotateAngleZ = rightUpperArmRotateAngleX = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
+	rotateHead = rotateBodyX = leftUpperArmRotateAngleZ = leftUpperArmRotateAngleX = leftLowerArmRotateAngle = rightUpperArmRotateAngleZ = rightUpperArmRotateAngleX = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = swordRotateAngleX = swordRotateAngleY = swordRotateAngleZ = 0;
 
-	rotateHeadState = translateBodyYState = translateBodyZState = rotateBodyXState = rotateBodyYState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = rightUpperArmRotateStateZ = rightLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1.0;
+	rotateHeadState = translateBodyYState = rotateBodyXState = rotateBodyYState = leftUpperArmRotateStateZ = leftUpperArmRotateStateX = leftLowerArmRotateState = rightUpperArmRotateStateZ = rightLowerArmRotateState = upperLegRotateState = lowerLegRotateState = swordRotateStateX = swordRotateStateY = swordRotateStateZ = 1;
 	rightUpperArmRotateStateX = -1.0;
 }
 
@@ -1986,7 +2099,7 @@ void SceneAssignment2::renderMorgana()
 {
 	//body
 	modelStack.PushMatrix(); //1
-	modelStack.Translate(translateBodyX, translateBodyY + -11.5, translateBodyZ);
+	modelStack.Translate(translateBodyX, translateBodyY + -11.5, translateBodyZ + translateBodyZExtra);
 	modelStack.Rotate(rotateBodyY, 0, 1, 0);
 	modelStack.Rotate(rotateBodyX, 1, 0, 0);
 	modelStack.Scale(1.2, 1.2, 1.2);
