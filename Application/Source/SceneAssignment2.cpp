@@ -47,7 +47,6 @@ void SceneAssignment2::Init()
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 
 	initLights();
-	glUniform1i(m_parameters[U_NUMLIGHTS], 3); //Max of 8 lights. rmb to change Light light[] when adding more
 
 	// Generate a default VBO for now
 	glGenVertexArrays(1, &m_vertexArrayID);
@@ -65,6 +64,7 @@ void SceneAssignment2::Init()
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 36, 36, 1.0f);
 	meshList[GEO_LIGHTBALL_2] = MeshBuilder::GenerateSphere("lightball2", Color(1, 1, 1), 36, 36, 1.0f);
 	meshList[GEO_LIGHTBALL_3] = MeshBuilder::GenerateSphere("lightball3", Color(1, 1, 1), 36, 36, 1.0f);
+	meshList[GEO_LIGHTBALL_4] = MeshBuilder::GenerateSphere("lightball4", Color(1, 1, 1), 36, 36, 1.0f);
 
 	initMorgana();
 	initScene();
@@ -123,6 +123,19 @@ void SceneAssignment2::assignParametersForLights()
 	m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
 	m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
 
+	//light 2
+	m_parameters[U_LIGHT3_POSITION] = glGetUniformLocation(m_programID, "lights[3].position_cameraspace");
+	m_parameters[U_LIGHT3_COLOR] = glGetUniformLocation(m_programID, "lights[3].color");
+	m_parameters[U_LIGHT3_POWER] = glGetUniformLocation(m_programID, "lights[3].power");
+	m_parameters[U_LIGHT3_KC] = glGetUniformLocation(m_programID, "lights[3].kC");
+	m_parameters[U_LIGHT3_KL] = glGetUniformLocation(m_programID, "lights[3].kL");
+	m_parameters[U_LIGHT3_KQ] = glGetUniformLocation(m_programID, "lights[3].kQ");
+	m_parameters[U_LIGHT3_TYPE] = glGetUniformLocation(m_programID, "lights[3].type");
+	m_parameters[U_LIGHT3_SPOTDIRECTION] = glGetUniformLocation(m_programID, "lights[3].spotDirection");
+	m_parameters[U_LIGHT3_COSCUTOFF] = glGetUniformLocation(m_programID, "lights[3].cosCutoff");
+	m_parameters[U_LIGHT3_COSINNER] = glGetUniformLocation(m_programID, "lights[3].cosInner");
+	m_parameters[U_LIGHT3_EXPONENT] = glGetUniformLocation(m_programID, "lights[3].exponent");
+
 	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");
 	m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 }
@@ -133,7 +146,7 @@ void SceneAssignment2::initLights()
 	light[0].type = Light::LIGHT_POINT;
 	light[0].position.Set(0, 100, 0);
 	light[0].color.Set(1, 1, 1);
-	light[0].power = 10;
+	light[0].power = 15;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -156,7 +169,7 @@ void SceneAssignment2::initLights()
 	light[1].type = Light::LIGHT_POINT;
 	light[1].position.Set(0, 100, -675);
 	light[1].color.Set(1, 1, 1);
-	light[1].power = 50;
+	light[1].power = 30;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
@@ -179,7 +192,7 @@ void SceneAssignment2::initLights()
 	light[2].type = Light::LIGHT_POINT;
 	light[2].position.Set(0, 100, -935);
 	light[2].color.Set(1, 1, 1);
-	light[2].power = 50;
+	light[2].power = 30;
 	light[2].kC = 1.f;
 	light[2].kL = 0.01f;
 	light[2].kQ = 0.001f;
@@ -197,6 +210,31 @@ void SceneAssignment2::initLights()
 	glUniform1f(m_parameters[U_LIGHT2_COSCUTOFF], light[2].cosCutoff);
 	glUniform1f(m_parameters[U_LIGHT2_COSINNER], light[2].cosInner);
 	glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
+
+	//light 3
+	light[3].type = Light::LIGHT_SPOT;
+	light[3].position.Set(-4, 35, -1105);
+	light[3].color.Set(1, 1, 1);
+	light[3].power = 5;
+	light[3].kC = 1.f;
+	light[3].kL = 0.01f;
+	light[3].kQ = 0.001f;
+	light[3].cosCutoff = cos(Math::DegreeToRadian(45));
+	light[3].cosInner = cos(Math::DegreeToRadian(30));
+	light[3].exponent = 3.f;
+	light[3].spotDirection.Set(0.f, 1.f, 0.f);
+
+	glUniform1i(m_parameters[U_LIGHT3_TYPE], light[3].type);
+	glUniform3fv(m_parameters[U_LIGHT3_COLOR], 1, &light[3].color.r);
+	glUniform1f(m_parameters[U_LIGHT3_POWER], light[3].power);
+	glUniform1f(m_parameters[U_LIGHT3_KC], light[3].kC);
+	glUniform1f(m_parameters[U_LIGHT3_KL], light[3].kL);
+	glUniform1f(m_parameters[U_LIGHT3_KQ], light[3].kQ);
+	glUniform1f(m_parameters[U_LIGHT3_COSCUTOFF], light[3].cosCutoff);
+	glUniform1f(m_parameters[U_LIGHT3_COSINNER], light[3].cosInner);
+	glUniform1f(m_parameters[U_LIGHT3_EXPONENT], light[3].exponent);
+
+	glUniform1i(m_parameters[U_NUMLIGHTS], 4); //Max of 8 lights. rmb to change Light light[] when adding more
 }
 
 void SceneAssignment2::initMorgana()
@@ -343,6 +381,7 @@ void SceneAssignment2::initScene()
 	doorRotateAngle = 0;
 	doorOpen = false;
 	pickUpKey = false;
+	pickUpCrown = false;
 	showDebugInfo = true;
 	fakeFrontScale = 50;
 	textTimer = -1;
@@ -399,6 +438,7 @@ void SceneAssignment2::initRoom()
 	meshList[GEO_REDQUAD]->material.kShininess = 1.f;
 	meshList[GEO_KEY] = MeshBuilder::GenerateOBJMTL("key", "OBJ//Assignment2//key.obj", "OBJ//Assignment2//key.mtl");
 	meshList[GEO_KEY]->textureID = LoadTGA("Image//Assignment2//key.tga");
+	meshList[GEO_CROWN] = MeshBuilder::GenerateOBJMTL("crown", "OBJ//Assignment2//crown.obj", "OBJ//Assignment2//crown.mtl");
 }
 
 void SceneAssignment2::Update(double dt)
@@ -466,7 +506,32 @@ void SceneAssignment2::Update(double dt)
 		std::cout << "X: " << camera.position.x << ", " << "Z: " << camera.position.z << std::endl;
 	}
 
-	if (Application::IsKeyPressed('R'))
+	if (Application::IsKeyPressed('I'))
+	{
+		light[3].position.z -= (float)(LSPEED * dt);
+	}
+	if (Application::IsKeyPressed('K'))
+	{
+		light[3].position.z += (float)(LSPEED * dt);
+	}
+	if (Application::IsKeyPressed('J'))
+	{
+		light[3].position.x -= (float)(LSPEED * dt);
+	}
+	if (Application::IsKeyPressed('L'))
+	{
+		light[3].position.x += (float)(LSPEED * dt);
+	}
+	if (Application::IsKeyPressed('O'))
+	{
+		light[3].position.y -= (float)(LSPEED * dt);
+	}
+	if (Application::IsKeyPressed('P'))
+	{
+		light[3].position.y += (float)(LSPEED * dt);
+	}
+
+	/*if (Application::IsKeyPressed('R'))
 	{
 		reset();
 		translateBodyX = translateBodyY = translateBodyZ = 0;
@@ -477,7 +542,7 @@ void SceneAssignment2::Update(double dt)
 		timer = 0;
 		light[0].position.Set(0, 20, 0);
 		camera.Reset(Vector3(0, 0, 10), Vector3(0, 0, 0), Vector3(0, 1, 0));
-	}
+	}*/
 
 	//if (Application::IsKeyPressed(VK_SPACE)) //attack
 	//{
@@ -518,7 +583,6 @@ void SceneAssignment2::Update(double dt)
 		dancing(LSPEED, dt);
 
 	gameStateManager(dt);
-	//boundsCheck();
 }
 
 void SceneAssignment2::Render()
@@ -572,6 +636,11 @@ void SceneAssignment2::Render()
 	modelStack.PushMatrix();
 	modelStack.Translate(light[2].position.x, light[2].position.y, light[2].position.z);
 	RenderMesh(meshList[GEO_LIGHTBALL_3], false);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(light[3].position.x, light[3].position.y, light[3].position.z);
+	RenderMesh(meshList[GEO_LIGHTBALL_4], false);
 	modelStack.PopMatrix();
 }
 
@@ -726,10 +795,10 @@ void SceneAssignment2::renderLights()
 	Position lightDirection_cameraspace2 = viewStack.Top() * light[2].position;
 	glUniform3fv(m_parameters[U_LIGHT2_POSITION], 1, &lightDirection_cameraspace2.x);
 
-	/*Position lightPosition_cameraspace1 = viewStack.Top() * light[1].position;
-	glUniform3fv(m_parameters[U_LIGHT1_POSITION], 1, &lightPosition_cameraspace1.x);
-	Vector3 spotDirection_cameraspace1 = viewStack.Top() * light[1].spotDirection;
-	glUniform3fv(m_parameters[U_LIGHT1_SPOTDIRECTION], 1, &spotDirection_cameraspace1.x);*/
+	Position lightPosition_cameraspace3 = viewStack.Top() * light[3].position;
+	glUniform3fv(m_parameters[U_LIGHT3_POSITION], 1, &lightPosition_cameraspace3.x);
+	Vector3 spotDirection_cameraspace3 = viewStack.Top() * light[3].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT3_SPOTDIRECTION], 1, &spotDirection_cameraspace3.x);
 
 	//copy from here if need and make sure to change to the correct light and the middle of function thing also need change maybe its very weird for now not changing works but tbh idk
 	/*if (light[0].type == Light::LIGHT_DIRECTIONAL)
@@ -762,7 +831,7 @@ void SceneAssignment2::renderGameText() //render text
 		if (camera.checkPosition(5, -5, 0, 0, -10) == true && doorOpen == false) 
 		{
 			modelStack.PushMatrix();
-			modelStack.Translate(-5, 0, -15);
+			modelStack.Translate(-5, -2, -18);
 			RenderText(meshList[GEO_TEXT], "Press E to open door", Color(0, 0, 0));
 			modelStack.PopMatrix();
 		}
@@ -773,7 +842,7 @@ void SceneAssignment2::renderGameText() //render text
 		if (camera.checkPosition(5, -5, 0, -162, -168) == true)
 		{
 			modelStack.PushMatrix();
-			modelStack.Translate(-2, 0, -170);
+			modelStack.Translate(-3, -1, -175);
 			RenderText(meshList[GEO_TEXT], "Press E to enter", Color(0, 0, 0));
 			modelStack.PopMatrix();
 		}
@@ -797,9 +866,9 @@ void SceneAssignment2::renderGameText() //render text
 		{
 			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(0, 1, 0), 4, 0, 0);
 			modelStack.PushMatrix();
-			modelStack.Translate(125, 0, -845);
+			modelStack.Translate(120, 0, -845);
 			modelStack.Rotate(-90, 0, 1, 0);
-			modelStack.Scale(5, 5, 5);
+			modelStack.Scale(4, 4, 4);
 			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
 			modelStack.PopMatrix();
 		}
@@ -826,9 +895,9 @@ void SceneAssignment2::renderGameText() //render text
 		{
 			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(0, 1, 0), 4, 0, 0);
 			modelStack.PushMatrix();
-			modelStack.Translate(125, 0, -845);
+			modelStack.Translate(120, 0, -845);
 			modelStack.Rotate(-90, 0, 1, 0);
-			modelStack.Scale(5, 5, 5);
+			modelStack.Scale(4, 4, 4);
 			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
 			modelStack.PopMatrix();
 		}
@@ -837,15 +906,19 @@ void SceneAssignment2::renderGameText() //render text
 			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Oh u have a key?", Color(0, 1, 0), 4, 0, 3);
 			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe try putting it on that pedestal?", Color(0, 1, 0), 4, 0, 0);
 		}
-		if (Application::IsKeyPressed('E') && camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 3 && pickUpKey == true)
+		if (camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 3 && pickUpKey == true)
 		{
 			modelStack.PushMatrix();
-			modelStack.Translate(-100, 0, -970);
+			modelStack.Translate(-120, 0, -970);
 			modelStack.Rotate(90, 0, 1, 0);
-			modelStack.Scale(5, 5, 5);
-			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
+			modelStack.Scale(4, 4, 4);
+			RenderText(meshList[GEO_TEXT], "Press E to place key", Color(0, 0, 0));
 			modelStack.PopMatrix();
-		}
+    	}
+		break;
+	case 7:
+		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: The wall disappeared! And the treasure", Color(0, 1, 0), 4, 0, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "is right there! Lets grab it and go. I'll wait by the exit.", Color(0, 1, 0), 4, 0, 0);
 		break;
 	case 99:
 		RenderTextOnScreen(meshList[GEO_TEXT], "You Lose", Color(0, 1, 0), 20, 13, 25);
@@ -1012,14 +1085,34 @@ void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana wi
 			pickUpKey = true;
 		if (Application::IsKeyPressed('E') && camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 3 && pickUpKey == true)
 		{
-			pickUpKey == false;
+			pickUpKey = false;
 			gameState = 7;
+			subGameState = 1;
+			rotateBodyY = 90;
 		}
 		break;
 	case 7:
-		if (fakeFrontScale <= 0)
-			fakeFrontScaleState = 0;
-		fakeFrontScale += (float)(fakeFrontScaleState * 35 * dt);
+		if (fakeFrontScale >= 0.1)
+			fakeFrontScale += (float)(-1 * 10 * dt);
+		if (translateBodyX == -120)
+		{
+			translateBodyXState = 0;
+			translateBodyZState = -1;
+			rotateBodyY = 180;
+		}
+		if (translateBodyZ == -1120)
+		{
+			translateBodyZState = 0;
+			rotateBodyY = 0;
+		}
+		if (Application::IsKeyPressed('E') && camera.checkPosition(4, -14, 0, -1080, -1090) == true)
+		{
+			pickUpCrown = false;
+			subGameState = 2;
+		}
+		translateBodyX += (float)(translateBodyXState * 25 * dt);
+		translateBodyZ += (float)(translateBodyZState * 25 * dt);
+		break;
 	}
 }
 
@@ -1441,16 +1534,19 @@ void SceneAssignment2::renderRoom(void)
 			modelStack.PopMatrix();
 
 			modelStack.PushMatrix(); //front
-			modelStack.Translate(-150 + x * 50, y * 50 - 15, -1250);
+			modelStack.Translate(-150 + x * 50, y * 50 - 15, -1150);
 			modelStack.Scale(50, 50, 50);
 			RenderMesh(meshList[GEO_FLOOR], true);
 			modelStack.PopMatrix();
 
-			modelStack.PushMatrix(); //fake front
-			modelStack.Translate(-150 + x * 50, y * 50 - 15, -1050);
-			modelStack.Scale(fakeFrontScale, fakeFrontScale, fakeFrontScale);
-			RenderMesh(meshList[GEO_FLOOR], true);
-			modelStack.PopMatrix();
+			if (fakeFrontScale >= 0.1)
+			{
+				modelStack.PushMatrix(); //fake front
+				modelStack.Translate(-150 + x * 50, y * 50 - 15, -1050);
+				modelStack.Scale(fakeFrontScale, fakeFrontScale, fakeFrontScale);
+				RenderMesh(meshList[GEO_FLOOR], true);
+				modelStack.PopMatrix();
+			}
 		}
 	}
 
@@ -1500,6 +1596,25 @@ void SceneAssignment2::renderRoom(void)
 		RenderMesh(meshList[GEO_KEY], true);
 		modelStack.PopMatrix();
 	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix(); //top
+	modelStack.Translate(0, -15, -1110);
+	RenderMesh(meshList[GEO_TOWERSQUAREBASE], true);
+	if (pickUpCrown == false)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(-5, 15.5, 5);
+		modelStack.Scale(2, 2, 2);
+		RenderMesh(meshList[GEO_CROWN], true);
+		modelStack.PopMatrix();
+	}
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix(); //middle tower
+	modelStack.Translate(-120, -15, -1130);
+	modelStack.Scale(3, 3, 3);
+	RenderMesh(meshList[GEO_TOWERSQUAREARCH], true);
 	modelStack.PopMatrix();
 
 	renderCover();
@@ -1743,6 +1858,9 @@ void SceneAssignment2::renderDebug(void)
 		RenderTextOnScreen(meshList[GEO_TEXT], "Z: " + std::to_string(camera.position.z), Color(0, 1, 0), 2, 0, 54);
 		RenderTextOnScreen(meshList[GEO_TEXT], "GameState " + std::to_string(gameState), Color(0, 1, 0), 2, 0, 52);
 		RenderTextOnScreen(meshList[GEO_TEXT], "SubGameState " + std::to_string(subGameState), Color(0, 1, 0), 2, 0, 50);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Light 3 X: " + std::to_string(light[3].position.x), Color(0, 1, 0), 2, 0, 48);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Light 3 Y: " + std::to_string(light[3].position.y), Color(0, 1, 0), 2, 0, 46);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Light 3 Z: " + std::to_string(light[3].position.z), Color(0, 1, 0), 2, 0, 44);
 	}
 }
 

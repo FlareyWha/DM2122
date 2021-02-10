@@ -62,11 +62,13 @@ private:
 		GEO_ENEMY,
 		GEO_REDQUAD,
 		GEO_KEY,
+		GEO_CROWN,
 		GEO_TEXT,
 		GEO_FLOOR,
 		GEO_LIGHTBALL,
 		GEO_LIGHTBALL_2,
 		GEO_LIGHTBALL_3,
+		GEO_LIGHTBALL_4,
 		NUM_GEOMETRY,
 	};
 
@@ -79,6 +81,7 @@ private:
 		U_MATERIAL_DIFFUSE,
 		U_MATERIAL_SPECULAR,
 		U_MATERIAL_SHININESS,
+
 		//Light 0
 		U_LIGHT0_POSITION,
 		U_LIGHT0_COLOR,
@@ -117,6 +120,19 @@ private:
 		U_LIGHT2_COSCUTOFF,
 		U_LIGHT2_COSINNER,
 		U_LIGHT2_EXPONENT,
+
+		//light 3
+		U_LIGHT3_POSITION,
+		U_LIGHT3_COLOR,
+		U_LIGHT3_POWER,
+		U_LIGHT3_KC,
+		U_LIGHT3_KL,
+		U_LIGHT3_KQ,
+		U_LIGHT3_TYPE,
+		U_LIGHT3_SPOTDIRECTION,
+		U_LIGHT3_COSCUTOFF,
+		U_LIGHT3_COSINNER,
+		U_LIGHT3_EXPONENT,
 
 		U_LIGHTENABLED,
 		U_NUMLIGHTS,
@@ -188,9 +204,9 @@ private:
 	float doorRotateAngle;
 	bool doorOpen;
 	bool pickUpKey;
+	bool pickUpCrown;
 	double textTimer;
 	float fakeFrontScale;
-	bool fakeFrontScaleState;
 
 	int gameState;
 	int subGameState;
@@ -210,7 +226,7 @@ private:
 
 	MS modelStack, viewStack, projectionStack;
 
-	Light light[3]; //change when adding more
+	Light light[4]; //change when adding more
 
 	void RenderMesh(Mesh* mesh, bool enableLight);
 	void RenderSkybox();
