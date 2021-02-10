@@ -35,7 +35,6 @@ private:
 		GEO_BLADE,
 		GEO_SPHERE,
 		//end of morgana shapes -------------------------
-		GEO_QUAD,
 		GEO_BLACK_QUAD,
 		//skybox -----------------------------------
 		GEO_SUNSETLEFT,

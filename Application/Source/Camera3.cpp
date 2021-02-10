@@ -226,8 +226,8 @@ void Camera3::boundsCheck(int gameState)
 			position = prevPos;
 		break;
 	case 3:
-		/*if (position.z <= -680) //activate this ltr
-			position.z = -680;*/
+		if (position.z <= -680)
+			position.z = -680;
 		break;
 	case 4: 
 		if (position.z <= -1045)
@@ -250,7 +250,7 @@ void Camera3::boundsCheck(int gameState)
 	if (roomBounds == true)
 	{
 		position.x = Math::Clamp(position.x, -145.f, 145.f); //outer wall
-		position.z = Math::Clamp(position.z, -1145.f, -555.f); //outer wall
+		position.z = Math::Clamp(position.z, -1165.f, -555.f); //outer wall
 		if (checkPrevPosition(148, -2, 0, -552, -582) == false && checkPosition(148, -2, 0, -552, -582) == true)
 			position = prevPos;
 		if (checkPrevPosition(67, -148, 0, -592, -607) == false && checkPosition(67, -148, 0, -592, -607) == true)

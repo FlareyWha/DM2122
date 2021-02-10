@@ -57,9 +57,6 @@ void SceneAssignment2::Init()
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
 
-	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", Color(1,1,1), 1.0f);
-	meshList[GEO_QUAD]->textureID = LoadTGA("Image//color.tga");
-
 	meshList[GEO_BLACK_QUAD] = MeshBuilder::GenerateQuad("blackQuad", Color(0, 0, 0), 1.0f);
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("lightball", Color(1, 1, 1), 36, 36, 1.0f);
 	meshList[GEO_LIGHTBALL_2] = MeshBuilder::GenerateSphere("lightball2", Color(1, 1, 1), 36, 36, 1.0f);
@@ -382,7 +379,7 @@ void SceneAssignment2::initScene()
 	doorOpen = false;
 	pickUpKey = false;
 	pickUpCrown = false;
-	showDebugInfo = true;
+	showDebugInfo = false;
 	fakeFrontScale = 50;
 	textTimer = -1;
 
@@ -489,89 +486,25 @@ void SceneAssignment2::Update(double dt)
 		showDebugInfo = true;
 	else if (Application::IsKeyPressed(VK_F4))
 		showDebugInfo = false;
-	if (Application::IsKeyPressed(VK_F5)) //DELETE LTR
-	{
-		translateBodyXState = 0;
-		translateBodyZState = 0;
-		translateBodyX = -140;
-		translateBodyZ = -585;
-		camera.position.Set(-142, 0, -560);
-		rotateBodyY = 90;
-		translateBodyXState = 1;
-		isWalking = true;
-		gameState = 3;
-	}
-	if (Application::IsKeyPressed(VK_F6))
-	{
-		std::cout << "X: " << camera.position.x << ", " << "Z: " << camera.position.z << std::endl;
-	}
 
-	if (Application::IsKeyPressed('I'))
-	{
-		light[3].position.z -= (float)(LSPEED * dt);
-	}
-	if (Application::IsKeyPressed('K'))
-	{
-		light[3].position.z += (float)(LSPEED * dt);
-	}
-	if (Application::IsKeyPressed('J'))
-	{
-		light[3].position.x -= (float)(LSPEED * dt);
-	}
-	if (Application::IsKeyPressed('L'))
-	{
-		light[3].position.x += (float)(LSPEED * dt);
-	}
-	if (Application::IsKeyPressed('O'))
-	{
-		light[3].position.y -= (float)(LSPEED * dt);
-	}
-	if (Application::IsKeyPressed('P'))
-	{
-		light[3].position.y += (float)(LSPEED * dt);
-	}
-
-	/*if (Application::IsKeyPressed('R'))
+	if (Application::IsKeyPressed('R'))
 	{
 		reset();
 		translateBodyX = translateBodyY = translateBodyZ = 0;
 		isWalking = false;
 		isAttacking = false;
 		isDancing = false;
-		attackingPhase = 0;
 		timer = 0;
-		light[0].position.Set(0, 20, 0);
-		camera.Reset(Vector3(0, 0, 10), Vector3(0, 0, 0), Vector3(0, 1, 0));
-	}*/
-
-	//if (Application::IsKeyPressed(VK_SPACE)) //attack
-	//{
-	//	reset();
-	//	isAttacking = true;
-	//	rotateBodyXState = 0;
-	//	attackingPhase = 1;
-	//	translateBodyZExtraState = -1;
-	//	leftUpperArmRotateStateZ = -1;
-	//	swordRotateStateX = 0;
-	//	swordRotateStateY = 1;
-	//	leftLowerArmRotateState = 0;
-	//}
-
-	//if (Application::IsKeyPressed('G')) //dancing
-	//{
-	//	reset();
-	//	isDancing = true;
-	//	danceState = 1;
-	//	rotateHeadState = 0;
-	//	rotateBodyYState = 1;
-	//	leftUpperArmRotateStateX = 1;
-	//	leftLowerArmRotateState = -1;
-	//	rightUpperArmRotateStateX = -1;
-	//	rightUpperArmRotateStateZ = 1;
-	//	rightLowerArmRotateState = -1;
-	//	upperLegRotateState = -1;
-	//	lowerLegRotateState = -1;
-	//}
+		attackingPhase = 0;
+		danceState = 0;
+		gameState = 1;
+		subGameState = 1;
+		rotateBodyY = 0;
+		doorRotateAngle = 0;
+		pickUpCrown = false;
+		pickUpKey = false;
+		camera.Reset(Vector3(0, 0, 50), Vector3(0, 0, 0), Vector3(0, 1, 0));
+	}
 
 	if (isWalking == true)
 		walking(LSPEED, dt);
@@ -620,6 +553,9 @@ void SceneAssignment2::Render()
 		RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 40, 30, 80, 60);
 	if (pickUpKey)
 		RenderMeshOnScreen(meshList[GEO_KEY], 70, 5, 2, 1);
+	//if (pickUpCrown)
+	//	RenderMeshOnScreen(meshList[GEO_CROWN], 72, 5, 5, 5);
+
 	renderGameText();
 	renderDebug();
 
@@ -826,8 +762,9 @@ void SceneAssignment2::renderGameText() //render text
 	switch (gameState)
 	{
 	case 1:
-		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Its time to take the treasure!" , Color(0, 1, 0), 4, 0, 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Lets head through the door first.", Color(0, 1, 0), 4, 0, 0);
+		RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Its time to take the treasure!" , Color(1, 1, 1), 4, 0, 4.5);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Lets head through the door first.", Color(1, 1, 1), 4, 0, 1.5);
 		if (camera.checkPosition(5, -5, 0, 0, -10) == true && doorOpen == false) 
 		{
 			modelStack.PushMatrix();
@@ -837,8 +774,9 @@ void SceneAssignment2::renderGameText() //render text
 		}
 		break;
 	case 2:
-		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: The infiltration point is right ahead.", Color(0, 1, 0), 4, 0, 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Its under that arch. Lets go!", Color(0, 1, 0), 4, 0, 0);
+		RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: The infiltration point is right ahead.", Color(1, 1, 1), 4, 0, 4.5);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Its under that arch. Lets go!", Color(1, 1, 1), 4, 0, 1.5);
 		if (camera.checkPosition(5, -5, 0, -162, -168) == true)
 		{
 			modelStack.PushMatrix();
@@ -850,25 +788,28 @@ void SceneAssignment2::renderGameText() //render text
 	case 3:
 		if (subGameState > 0 && subGameState < 3)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Theres an enemies right in front of us.", Color(0, 1, 0), 4, 0, 6);
-			RenderTextOnScreen(meshList[GEO_TEXT], "We should avoid fighting them.", Color(0, 1, 0), 4, 0, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Follow me, and dont get spotted.", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Theres an enemies right in front", Color(1, 1, 1), 4, 0, 6);
+			RenderTextOnScreen(meshList[GEO_TEXT], "of us. We should avoid fighting them.", Color(1, 1, 1), 4, 0, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Follow me, and dont get spotted.", Color(1, 1, 1), 4, 0, 0);
 		}
 		break;
 	case 4:
 		if (textTimer >= 0)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: There are more enemies ahead. I think", Color(0, 1, 0), 4, 0, 6);
-			RenderTextOnScreen(meshList[GEO_TEXT], "we should split up. Ill scout ahead. See you", Color(0, 1, 0), 4, 0, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT], "later. Good luck!", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: There are more enemies ahead.", Color(1, 1, 1), 4, 0, 6);
+			RenderTextOnScreen(meshList[GEO_TEXT], "I think we should split up. Ill scout", Color(1, 1, 1), 4, 0, 3);
+			RenderTextOnScreen(meshList[GEO_TEXT], " ahead. See you later. Good luck!", Color(1, 1, 1), 4, 0, 0);
 		}
 		if (camera.checkPosition(100, 90, 0, -830, -840) == true && pickUpKey == false)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(1, 1, 1), 4, 0, 2.5);
 			modelStack.PushMatrix();
 			modelStack.Translate(120, 0, -845);
 			modelStack.Rotate(-90, 0, 1, 0);
-			modelStack.Scale(4, 4, 4);
+			modelStack.Scale(3, 3, 3);
 			RenderText(meshList[GEO_TEXT], "Press E to pick up key", Color(0, 0, 0));
 			modelStack.PopMatrix();
 		}
@@ -876,24 +817,28 @@ void SceneAssignment2::renderGameText() //render text
 	case 5:
 		if (textTimer >= 0)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Its a dead end. This is weird.", Color(0, 1, 0), 4, 0, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe there's something behind this wall?", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Its a dead end. This is weird.", Color(1, 1, 1), 4, 0, 4.5);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe there's something behind this wall?", Color(1, 1, 1), 4, 0, 1.5);
 		}
 		break;
 	case 6:
 		if (subGameState == 1)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: That didnt work.", Color(0, 1, 0), 4, 0, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT], "There must be something here.", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: That didnt work.", Color(1, 1, 1), 4, 0, 4.5);
+			RenderTextOnScreen(meshList[GEO_TEXT], "There must be something here.", Color(1, 1, 1), 4, 0, 1.5); //other if else might make box die
 		}
 		if (camera.checkPosition(-80, -90, 0, -980, -1000) == true && subGameState == 2)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: A pedestal?", Color(0, 1, 0), 4, 0, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Wonder what its for...", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: A pedestal?", Color(1, 1, 1), 4, 0, 4.5);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Wonder what its for...", Color(1, 1, 1), 4, 0, 1.5);
 		}
 		if (camera.checkPosition(100, 90, 0, -830, -840) == true && pickUpKey == false)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "A key? I wonder what its for.", Color(1, 1, 1), 4, 0, 2.5);
 			modelStack.PushMatrix();
 			modelStack.Translate(120, 0, -845);
 			modelStack.Rotate(-90, 0, 1, 0);
@@ -903,28 +848,71 @@ void SceneAssignment2::renderGameText() //render text
 		}
 		if (subGameState == 3 && pickUpKey == true && textTimer == -1)
 		{
-			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Oh u have a key?", Color(0, 1, 0), 4, 0, 3);
-			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe try putting it on that pedestal?", Color(0, 1, 0), 4, 0, 0);
+			RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Oh u have a key?", Color(1, 1, 1), 4, 0, 4.5);
+			RenderTextOnScreen(meshList[GEO_TEXT], "Maybe try putting it on that pedestal?", Color(1, 1, 1), 4, 0, 1.5);
 		}
 		if (camera.checkPosition(-70, -90, 0, -980, -1000) == true && subGameState == 3 && pickUpKey == true)
 		{
 			modelStack.PushMatrix();
 			modelStack.Translate(-120, 0, -970);
 			modelStack.Rotate(90, 0, 1, 0);
-			modelStack.Scale(4, 4, 4);
+			modelStack.Scale(3, 3, 3);
 			RenderText(meshList[GEO_TEXT], "Press E to place key", Color(0, 0, 0));
 			modelStack.PopMatrix();
     	}
 		break;
 	case 7:
-		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: The wall disappeared! And the treasure", Color(0, 1, 0), 4, 0, 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "is right there! Lets grab it and go. I'll wait by the exit.", Color(0, 1, 0), 4, 0, 0);
+		RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: The wall disappeared! And the", Color(1, 1, 1), 4, 0, 6);
+		RenderTextOnScreen(meshList[GEO_TEXT], "treasure is right there! Lets grab it.", Color(1, 1, 1), 4, 0, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "and go. I'll wait by the exit.", Color(1, 1, 1), 4, 0, 0);
+		if (camera.checkPosition(4, -14, 0, -1080, -1090) == true && pickUpCrown == false)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(-10, 0, -1095);
+			RenderText(meshList[GEO_TEXT], "Press E to pick up crown", Color(0, 0, 0));
+			modelStack.PopMatrix();
+		}
+		break;
+	case 8:
+		RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Its time to go!", Color(1, 1, 1), 4, 0, 4.5);
+		RenderTextOnScreen(meshList[GEO_TEXT], "The exit is right here.", Color(1, 1, 1), 4, 0, 1.5);
+		if (camera.checkPosition(-120, -140, 0, -1100, -1130) == true)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(-135, 0, -1110);
+			modelStack.Rotate(90, 0, 1, 0);
+			RenderText(meshList[GEO_TEXT], "Press E to go back to entrance", Color(0, 0, 0));
+			modelStack.PopMatrix();
+		}
+		break;
+	case 9:
+		RenderMeshOnScreen(meshList[GEO_BLACK_QUAD], 30, 0, 60, 20);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Morgana: Nice job. One last thing,", Color(1, 1, 1), 4, 0, 6);
+		RenderTextOnScreen(meshList[GEO_TEXT], "I want to wear the crown. Can you put", Color(1, 1, 1), 4, 0, 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "it on my head?", Color(1, 1, 1), 4, 0, 0);
+		if (pickUpCrown == true)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(7, 1, -115);
+			modelStack.Rotate(180, 0, 1, 0);
+			modelStack.Scale(1.5, 1.5, 1.5);
+			RenderText(meshList[GEO_TEXT], "Press E to put crown on Morgana's head", Color(0, 0, 0));
+			modelStack.PopMatrix();
+		}
+		break;
+	case 10:
+		RenderTextOnScreen(meshList[GEO_TEXT], "You Win! :D", Color(1, 1, 1), 20, 3, 25);
 		break;
 	case 99:
-		RenderTextOnScreen(meshList[GEO_TEXT], "You Lose", Color(0, 1, 0), 20, 13, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT], "You Lose :(", Color(1, 1, 1), 20, 3, 25);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Press R to try again", Color(1, 1, 1), 10, 8, 10);
 		break;
 	}
 }
+
 void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana will go etc
 {
 	switch (gameState)
@@ -939,6 +927,7 @@ void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana wi
 			doorOpen = false;
 			isWalking = true;
 			rotateBodyY = 90;
+			translateBodyXState = 1;
 			translateBodyZState = 0;
 			gameState = 2;
 		}
@@ -1041,6 +1030,7 @@ void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana wi
 		}
 		if (camera.checkPosition(80, 0, 0, -953, -1045) == true && subGameState == 0)
 		{
+			reset();
 			rotateBodyY = 90;
 			gameState = 5;
 			textTimer = 0;
@@ -1088,30 +1078,79 @@ void SceneAssignment2::gameStateManager(double dt) //stuff like where morgana wi
 			pickUpKey = false;
 			gameState = 7;
 			subGameState = 1;
-			rotateBodyY = 90;
+			translateBodyXState = -1;
+			rotateBodyY = -90;
+			isWalking = true;
 		}
 		break;
 	case 7:
 		if (fakeFrontScale >= 0.1)
 			fakeFrontScale += (float)(-1 * 10 * dt);
-		if (translateBodyX == -120)
+		if (translateBodyX <= -120)
 		{
 			translateBodyXState = 0;
 			translateBodyZState = -1;
 			rotateBodyY = 180;
 		}
-		if (translateBodyZ == -1120)
+		if (translateBodyZ <= -1120)
 		{
+			reset();
 			translateBodyZState = 0;
 			rotateBodyY = 0;
+			isWalking = false;
 		}
 		if (Application::IsKeyPressed('E') && camera.checkPosition(4, -14, 0, -1080, -1090) == true)
 		{
-			pickUpCrown = false;
-			subGameState = 2;
+			pickUpCrown = true;
+			translateBodyXState = -1;
+			rotateBodyY = -90;
+			gameState = 8;
+			isWalking = true;
+		}
+		translateBodyX += (float)(translateBodyXState * 40 * dt);
+		translateBodyZ += (float)(translateBodyZState * 40 * dt);
+		break;
+	case 8:
+		if (translateBodyX <= -140)
+		{
+			translateBodyXState = 0;
+			translateBodyX = 0;
+			translateBodyZ = -115;
+			rotateBodyY = 180;
+			isWalking = false;
+			reset();
+		}
+		if (Application::IsKeyPressed('E') && camera.checkPosition(-120, -140, 0, -1100, -1130) == true)
+		{
+			camera.position.Set(0, 0, -145);
+			gameState = 9;
+			textTimer = 0;
 		}
 		translateBodyX += (float)(translateBodyXState * 25 * dt);
-		translateBodyZ += (float)(translateBodyZState * 25 * dt);
+		break;
+	case 9:
+		if (textTimer >= 2)
+			textTimer = -1;
+		if (Application::IsKeyPressed('E') && pickUpCrown == true && textTimer == -1)
+		{
+			pickUpCrown = false;
+			isDancing = true;
+			danceState = 1;
+			rotateHeadState = 0;
+			rotateBodyYState = 1;
+			leftUpperArmRotateStateX = 1;
+			leftLowerArmRotateState = -1;
+			rightUpperArmRotateStateX = -1;
+			rightUpperArmRotateStateZ = 1;
+			rightLowerArmRotateState = -1;
+			upperLegRotateState = -1;
+			lowerLegRotateState = -1;
+			gameState = 10;
+		}
+		break;
+	case 99:
+		pickUpKey = false;
+		pickUpCrown = false;
 		break;
 	}
 }
@@ -1534,7 +1573,7 @@ void SceneAssignment2::renderRoom(void)
 			modelStack.PopMatrix();
 
 			modelStack.PushMatrix(); //front
-			modelStack.Translate(-150 + x * 50, y * 50 - 15, -1150);
+			modelStack.Translate(-150 + x * 50, y * 50 - 15, -1170);
 			modelStack.Scale(50, 50, 50);
 			RenderMesh(meshList[GEO_FLOOR], true);
 			modelStack.PopMatrix();
@@ -1604,8 +1643,8 @@ void SceneAssignment2::renderRoom(void)
 	if (pickUpCrown == false)
 	{
 		modelStack.PushMatrix();
-		modelStack.Translate(-5, 15.5, 5);
-		modelStack.Scale(2, 2, 2);
+		modelStack.Translate(-5, 13.5, 5);
+		modelStack.Scale(1.5, 1.5, 1.5);
 		RenderMesh(meshList[GEO_CROWN], true);
 		modelStack.PopMatrix();
 	}
@@ -1858,9 +1897,7 @@ void SceneAssignment2::renderDebug(void)
 		RenderTextOnScreen(meshList[GEO_TEXT], "Z: " + std::to_string(camera.position.z), Color(0, 1, 0), 2, 0, 54);
 		RenderTextOnScreen(meshList[GEO_TEXT], "GameState " + std::to_string(gameState), Color(0, 1, 0), 2, 0, 52);
 		RenderTextOnScreen(meshList[GEO_TEXT], "SubGameState " + std::to_string(subGameState), Color(0, 1, 0), 2, 0, 50);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Light 3 X: " + std::to_string(light[3].position.x), Color(0, 1, 0), 2, 0, 48);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Light 3 Y: " + std::to_string(light[3].position.y), Color(0, 1, 0), 2, 0, 46);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Light 3 Z: " + std::to_string(light[3].position.z), Color(0, 1, 0), 2, 0, 44);
+		RenderTextOnScreen(meshList[GEO_TEXT], "TextTimer: " + std::to_string(textTimer), Color(0, 1, 0), 2, 0, 48);
 	}
 }
 
@@ -2029,7 +2066,7 @@ void SceneAssignment2::dancing(float LSPEED, double dt)
 	switch (danceState)
 	{
 	case 1:
-		if (rotateBodyY >= 40)
+		if (rotateBodyY >= 220)
 			rotateBodyYState = 0;
 		if (leftUpperArmRotateAngleX >= 20)
 			leftUpperArmRotateStateX = 0;
@@ -2059,7 +2096,7 @@ void SceneAssignment2::dancing(float LSPEED, double dt)
 		break;
 
 	case 2:
-		if (rotateBodyY <= -40)
+		if (rotateBodyY <= 140)
 		{
 			rotateBodyYState = 0;
 			timer += dt;
@@ -2111,7 +2148,7 @@ void SceneAssignment2::dancing(float LSPEED, double dt)
 		break;
 
 	case 4:
-		if (rotateBodyY >= 40)
+		if (rotateBodyY >= 220)
 		{
 			rotateBodyYState = 0;
 			timer += dt;
@@ -2159,7 +2196,7 @@ void SceneAssignment2::dancing(float LSPEED, double dt)
 		break;
 
 	case 6:
-		if (rotateBodyY <= 0)
+		if (rotateBodyY <= 180)
 			rotateBodyYState = 0;
 		if (leftUpperArmRotateAngleX >= 0)
 			leftUpperArmRotateStateX = 0;
@@ -2180,7 +2217,8 @@ void SceneAssignment2::dancing(float LSPEED, double dt)
 		if (rotateBodyYState == 0 && leftUpperArmRotateStateZ == 0 && rightUpperArmRotateStateZ == 0)
 		{
 			danceState = 0;
-			rotateHead = rotateBodyY = leftUpperArmRotateAngleX = leftUpperArmRotateAngleZ = leftLowerArmRotateAngle = rightUpperArmRotateAngleX = rightUpperArmRotateAngleZ = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = 0;
+			rotateBodyY = 180;
+			rotateHead = leftUpperArmRotateAngleX = leftUpperArmRotateAngleZ = leftLowerArmRotateAngle = rightUpperArmRotateAngleX = rightUpperArmRotateAngleZ = rightLowerArmRotateAngle = rotateUpperLegAngle = rotateLowerLegAngle = 0;
 			rotateHeadState = rotateBodyYState = leftLowerArmRotateState = leftUpperArmRotateStateX = leftUpperArmRotateStateZ = rightLowerArmRotateState = rightUpperArmRotateStateZ = upperLegRotateState = lowerLegRotateState = 1;
 			rightUpperArmRotateStateX = -1;
 			isDancing = false;
@@ -2250,6 +2288,16 @@ void SceneAssignment2::renderHead(void)
 	RenderMesh(meshList[GEO_HEAD], true);
 	modelStack.Rotate(-90, 0, 1, 0);
 	modelStack.Scale(0.8, 0.8, 0.8);
+
+	if (gameState == 10 && pickUpCrown == false)
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(0, 3, 0);
+		modelStack.Scale(1.5, 1.5, 1.5);
+		RenderMesh(meshList[GEO_CROWN], true);
+		modelStack.PopMatrix();
+	}
+
 	//left ear
 	modelStack.PushMatrix(); //2
 	modelStack.Translate(-1.6, 1.8, 0);
