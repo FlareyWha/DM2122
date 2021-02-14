@@ -543,7 +543,7 @@ void SceneAssignment2::Render()
 	renderMorgana();
 
 	//skybox
-	if (gameState < 3)
+	if (gameState < 3 || gameState > 8)
 		RenderSkybox();
 	renderCastle();
 	renderFloor();
